@@ -4,7 +4,11 @@
 
 #include "Window.h"
 
-Window::Window(HINSTANCE hinstance, int nCmdShow) {
+Window::Window(const std::function<void ()>& f) : onCreateWindow(f) {
+
+}
+
+void Window::Init(HINSTANCE hinstance, int nCmdShow) {
     const char g_szClassName[] = "myWindowClass";
 
     WNDCLASSEX wc;
@@ -59,7 +63,7 @@ WPARAM Window::ReturnMsg() {
     return (msg.wParam);
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_CLOSE:
             DestroyWindow(hwnd);
@@ -67,6 +71,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
         case WM_DESTROY:
             PostQuitMessage(0);
+            break;
+
+        case WM_CREATE:
+            onCreateWindow();
             break;
 
         default:
